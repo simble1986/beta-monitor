@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block theme %}
+{{ theme }}
+{% endblock %}
+
+{% block content %}
+<script src="{{ url_for('static', filename='js/mydetail.js')}}"></script>
+
+<div class="container w-75 mb-xl-4">
+    <div id="myCard" class="card shadow-sm mt-2 mb-2 border-warning">
+        <div id="myHeader" class="card-header text-center bg-transparent border-warning">
+            <button class="btn btn-warning active" id="b0" onclick="renderContent(this)" style="margin: 2px">Coredump Device</button>
+            <button class="btn btn-danger" id="b1" onclick="renderContent(this)" style="margin: 2px">Error Device</button>
+            <button class="btn btn-success" id="b2" onclick="renderContent(this)" style="margin: 2px">Online</button>
+            <button class="btn btn-danger" id="b3" onclick="renderContent(this)" style="margin: 2px">Offline</button>
+            <button class="btn btn-info" id="b4" onclick="renderContent(this)" style="margin: 2px">Unknown</button>
+            <button class="btn btn-danger" id="b5" onclick="renderContent(this)" style="margin: 2px">Danger Test</button>
+            <button class="btn btn-primary" id="b6" onclick="renderContent(this)" style="margin: 2px">Primary Test</button>
+            <button class="btn btn-dark" id="b7" onclick="renderContent(this)" style="margin: 2px">Dark Test</button>
+            <button class="btn btn-secondary" id="b8" onclick="renderContent(this)" style="margin: 2px">Secondary Test</button>
+            <button class="btn btn-danger" id="b9" onclick="renderContent(this)" style="margin: 2px">Danger Test</button>
+            <button class="btn btn-success" id="b10" onclick="renderContent(this)" style="margin: 2px">Danger Test</button>
+            <button class="btn btn-warning" id="b11" onclick="renderContent(this)" style="margin: 2px">Danger Test</button>
+            <button class="btn btn-primary" id="b12" onclick="renderContent(this)" style="margin: 2px">Online 1</button>
+            <button class="btn btn-success" id="b13" onclick="renderContent(this)" style="margin: 2px">Online 22</button>
+            <button class="btn btn-dark" id="b14" onclick="renderContent(this)" style="margin: 2px">Online 333</button>
+            <button class="btn btn-info" id="b15" onclick="renderContent(this)" style="margin: 2px">Online 444444</button>
+            <button class="btn btn-primary" id="b16" onclick="renderContent(this)" style="margin: 2px">Online 55555</button>
+            <button class="btn btn-danger" id="b17" onclick="renderContent(this)" style="margin: 2px">Online 666666</button>
+            <button class="btn btn-warning" id="b18" onclick="renderContent(this)" style="margin: 2px">Online 7777777</button>
+            <button class="btn btn-success" id="b19" onclick="renderContent(this)" style="margin: 2px">Online 88888888</button>
+            <button class="btn btn-info" id="b20" onclick="renderContent(this)" style="margin: 2px">Online 999999999</button>
+            <button class="btn btn-dark" id="b21" onclick="renderContent(this)" style="margin: 2px">Online 1111111110</button>
+
+            <div class="row">
+                <div class="col">
+                    <hr class="text-dark" style="margin: 12px">
+                </div>
+
+                <div class="col-md-auto" style="padding:0" id="down" onclick="updown('up')">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="col-md-auto" style="padding:0; display: none" id="up" onclick="updown('down')">
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+                <div class="col">
+                    <hr class="text-dark" style="margin: 12px">
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="container">
+                <div id="cont1" style="min-height: 50px">
+                </div>
+                <hr>
+                <div id="cont2" style="min-height: 200px">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        $(function($){
+            $("#up").hide();
+            var myWidth=10;
+            $("button.btn").each(function(){
+                if((myWidth+this.offsetWidth)<$("#myHeader")[0].offsetWidth){
+                    this.hidden=false;
+                }
+                else{
+                    this.hidden=true;
+                }
+                myWidth += this.offsetWidth+10;
+                });
+        })
+    </script>
+</div>
+
+
+{% endblock %}

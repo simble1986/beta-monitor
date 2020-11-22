@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block theme %}
+{{ theme }}
+{% endblock %}
+
+{% block content %}
+<script src="{{ url_for('static', filename='js/settings.js')}}"></script>
+
+<div class="container w-75 mb-xl-4">
+    <div class="card shadow-sm mt-2 mb-2">
+        <div class="card-header">
+            Settings
+        </div>
+        <div class="card-body accordion" data-spy="scroll" id="accordionExample">
+            <section class="shadow-sm p-3 mb-3" id="headingOne">
+                <div>
+                    <h4>
+                        探测器
+                        <button class="btn btn-light float-right" type="button" data-toggle="collapse" data-target="#scanner" aria-expanded="true" aria-controls="scanner">
+                            展开
+                        </button>
+                    </h4>
+                    <p>
+                        设置扫描脚本的运行周期
+                    </p>
+                </div>
+
+                <div id="scanner" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                    <hr>
+                    <form class="w-75">
+                        <div class="row">
+                            <label class="col-3 form-inline" for="scanTime">扫描间隔(分）</label>
+                            <input type="range" class="col-9 form-inline custom-range pb-0" min="10" max="60" step="5" id="scanTime" value="{{ scansetting }}" oninput="numChange()">
+                        </div>
+                        <div class="row pt-0 pb-0">
+                            <div class="col-3"></div>
+                            <input id="timeShow" class="form-inline form-control-plaintext text-center col-9" value="{{ scansetting }}" readonly>
+                        </div>
+                        <hr>
+                        <div class="row pt-0 pb-3">
+                            <label class="col-3 form-inline" for="dailyReportTime">日报时间设定</label>
+                            <div class="col-9" id="dailyReportTime">
+                            </div>
+
+                        </div>
+                        <a href="#" class="btn btn-success" onclick="updateScan()">Save Change</a>
+                    </form>
+                </div>
+            </section>
+
+            <section class="shadow-sm p-3 mb-3" id="themes">
+                <div>
+                    <h4>
+                        主题
+                        <button class="btn btn-light float-right" type="button" data-toggle="collapse" data-target="#theme" aria-expanded="true" aria-controls="theme">
+                            展开
+                        </button>
+                    </h4>
+                    <p>
+                        设置主题
+                    </p>
+                </div>
+
+                <div id="theme" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                    <hr>
+                    <form class="w-75">
+                        <div class="row">
+                            <label class="col-3 form-inline" for="themeSetting">可选主题</label>
+                            <div class="col-9" id="themeSetting">
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-success" onclick="updateTheme()">Save Change</a>
+                    </form>
+                </div>
+            </section>
+
+            <section class="shadow-sm p-3 mb-3" id="headingTwo">
+                <div>
+                    <h4>
+                        邮件设置
+                        <button class="btn btn-light float-right" type="button" data-toggle="collapse" data-target="#email" aria-expanded="true" aria-controls="email">
+                            展开
+                        </button>
+                    </h4>
+
+                </div>
+                {% if mailserver == '' %}
+                    <p>
+                        如果接收邮件遇到问题，请联系管理员。
+                    </p>
+                {% else %}
+                    <p>
+                        设置邮件服务器
+                    </p>
+                <div id="email" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                    <hr>
+                    <div class="custom-control custom-switch">
+                        <input class="custom-control-input" type="checkbox" id="userdef_email" name="userdef_email" onclick="showEmailSetting()" checked="">
+                        <label class="custom-control-label" for="userdef_email">
+                            自定义发件服务器
+                        </label>
+                    </div>
+                    <form id="mailSettings" class="w-75">
+
+                    </form>
+                    <a href="#" class="btn btn-success" onclick="changeMail()">Save Change</a>
+                </div>
+                {% endif %}
+
+            {% if users!='' %}
+            </section>
+
+            <section class="shadow-sm p-3 mb-3" id="headingThree">
+                <div>
+                    <h4>
+                        用户管理
+                        <button class="btn btn-light float-right" type="button" data-toggle="collapse" data-target="#user" aria-expanded="true" aria-controls="user">
+                            展开
+                        </button>
+                    </h4>
+
+                </div>
+                <p>
+                    管理用户信息
+                </p>
+                <div id="user" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+
+                    <div class="w-75">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">FullName</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Devies</th>
+                                <th scope="col">Projects</th>
+                                <th scope="col">Group</th>
+                                <th scope="col">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for id, username, fullname, email, devices, projects, group, groupspan in users %}
+                            <tr id="user_{{ id }}">
+                                <td>{{ username }}</td>
+                                <td>{{ fullname }}</td>
+                                <td>{{ email }}</td>
+                                <td>{{ devices }}</td>
+                                <td>{{ projects }}</td>
+                                <td><span class="d-inline {{ groupspan }} btn-sm" data-toggle="tooltip" data-placement="top">{{ group }}</span></td>
+
+                                <td>
+                                    {% if group=='User' or username==current_user.name %}
+                                        <a title="更新用户信息" href="#" onclick="getUserDetail({{ id }}, true)">
+                                            <i class="fas fa-pen-square text-primary"></i>
+                                        </a>
+                                        <a title="重置密码" href="#" onclick="resetPassword({{ id }})">
+                                            <i class="fas fa-key text-success"></i>
+
+                                        </a>
+                                        <a title="删除用户" href="#" onclick="delUser('{{ username }}', {{ id }})" >
+                                            <i class="fas fa-minus-square text-danger" ></i>
+                                        </a>
+                                    {% else %}
+                                        <a title="无此权限" href="javascript:return false;" onclick="return false;">
+                                            <i class="fas fa-pen-square text-primary" style="opacity: 0.2"></i>
+                                        </a>
+                                        <a title="无此权限" href="javascript:return false;" onclick="return false;">
+                                            <i class="fas fa-key text-success" style="opacity: 0.2"></i>
+                                        </a>
+                                        <a title="无此权限" href="javascript:return false;" onclick="return false;" >
+                                            <i class="fas fa-minus-square text-danger"  style="opacity: 0.2"></i>
+                                        </a>
+                                    {% endif %}
+                                </td>
+
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+            </section>
+
+            <section class="shadow-sm p-3 mb-3" id="headingFour">
+                <div>
+                    <h4>
+                        设备类型
+                        <button class="btn btn-light float-right" type="button" data-toggle="collapse" data-target="#other" aria-expanded="true" aria-controls="other">
+                            展开
+                        </button>
+                    </h4>
+                    <p>
+                        设备类型
+                    </p>
+                </div>
+
+                <div id="other" class="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
+                    <div class="w-75">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">类型</th>
+                                <th scope="col">说明</th>
+                                <th scope="col">日报脚本</th>
+                                <th scope="col">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td scope="col">StoneOS</td>
+                                <td scope="col">默认设备类型</td>
+                                <td scope="col">dailyReport.py</td>
+                                <td scope="col"></td>
+                            </tr>
+                            <tr>
+                                <td scope="col">WAF</td>
+                                <td scope="col">Hillstone WAF</td>
+                                <td scope="col">wafDailyReport.py</td>
+                                <td scope="col">
+                                    <a href="#" class="text-danger" id="delDeviceType">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalLabel">删除用户</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="confirmInfo">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">取消</button>
+        <button type="button" id="ModalYes" class="btn btn-primary yes">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+ <div class="modal fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="resetModalLabel">重置密码</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="confirmreset">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">取消</button>
+        <button type="button" id="resetYes" class="btn btn-primary yes">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">用户信息</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body" id="detailInfo">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="cancelBrn" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" style="display: none;" id="okBtn">保存</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+<script>
+    jQuery(document).ready(function($){
+        showDailySetting();
+        showThemeSetting();
+        showEmailForm();
+    })
+</script>
+{% endblock %}

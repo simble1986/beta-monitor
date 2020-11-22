@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block theme %}
+{{ theme }}
+{% endblock %}
+
+{% block content %}
+<script src="{{ url_for('static', filename='js/profile.js')}}"></script>
+
+<div class="container w-75">
+    <div class="card shadow-sm mt-2 mb-2">
+        <div class="card-header">
+            编辑个人资料
+        </div>
+        <div class="card-body">
+            <form class="m-3">
+                <div class="row">
+                    <div class="col-1">
+                    </div>
+                    <div class="col-3 text-center">
+                        <a target="_blank" rel="noopener noreferrer" href="{{ userinfo.avatar }}">
+                            <img class="rounded-circle" style="width:150px; height:150px" src="{{ userinfo.avatar }}">
+                        </a>
+                    </div>
+                    <div class="border-left col-6">
+                        <h5 class="mb-2">上传新头像</h5>
+                        <div class="input-group mb-2">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="inputAvatarImg">
+                                <label class="custom-file-label" for="inputAvatarImg">选择文件</label>
+                            </div>
+                            <div class="input-group-addon ml-3">
+                                <button class="btn btn-success" type="button" id="inputAvatarLabel" onclick="uploadAvatar()">更新头像</button>
+                            </div>
+                        </div>
+                        <hr class="mt-2 mb-2">
+                        <div class="mb-2">
+                            <a href="#" class="btn btn-danger btn-inverted" data-toggle="modal" data-target="#clearAvatarModal">
+                                删除头像
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <hr>
+
+                <div class="row">
+                    <div class="col-4 ml-5">
+                        <h4>
+                            个人信息
+                        </h4>
+                        <p>
+                            更新您的个人信息
+                        </p>
+                    </div>
+                    <div class="col-5">
+                        <div class="row" hidden>
+                                <div class="form-group col-md-12">
+                                    <input class="form-control" id="userID" type="text" value="{{ userinfo.id }}" disabled>
+                                </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-bold" for="myfullname">Full Name</label>
+                            <input class="form-control" type="text" id="myfullname" value="{{ userinfo.fullname }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-bold" for="myemail">Email</label>
+                            <input class="form-control" type="email" id="myemail" value="{{ userinfo.email }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-bold" for="mypassword">Password</label>
+                            <input class="form-control" type="password" id="mypassword" value="{{ userinfo.password }}">
+                            <label class="font-weight-bold" for="myconfrim">Confirm</label>
+                            <input class="form-control" type="password" id="myconfrim" value="{{ userinfo.password }}">
+                        </div>
+                        <hr class="mt-2 mb-2">
+                        <div class="mb-2">
+                            <button data-confirm="即将更改个人信息。确定继续吗？" class="btn btn-success btn-inverted float-right" type="button" onclick="updateUser()">更新</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 清除头像确认 -->
+<div class="modal fade" id="clearAvatarModal" tabindex="-1" role="dialog" aria-labelledby="clearAvatarModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="clearAvatarModalLabel"><i class="fas fa-info-circle text-danger"></i> 清除头像</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="clearAvatarInfo">
+          <span>您确定</span><span class="text-danger">删除</span><span>当前的头像么？删除后，将重置为系统默认头像。</span>
+      </div>
+      <div class="modal-footer">
+          <button type="button" id="clearAvatarModalYes" class="btn btn-primary yes" onclick="clearAvatar()">确认</button>
+          <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block theme %}
+{{ theme }}
+{% endblock %}
+
+{% block content %}
+<script src="{{ url_for('static', filename='js/project.js')}}"></script>
+
+<div class="container w-75 mb-xl-4">
+    <div class="card shadow-sm mt-2 mb-2">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs nav-fill" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link {% if current_user.is_authenticated %}active{% else %}disabled{% endif %}" id="myProjs" href="#" onclick="displayProjects({{ current_user.id }})" data-toggle="tab" role="tab" aria-selected="{% if current_user.is_authenticated %}true{% else %}false{% endif %}">
+                        My Projects
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if not current_user.is_authenticated %}active{% endif %}" id="allProjs" href="#" onclick="displayProjects()" data-toggle="tab" role="tab" aria-selected="{% if not current_user.is_authenticated %}true{% else %}false{% endif %}">
+                        All Projects
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body pt-0 pb-0" id="projectTabs">
+
+            <!-- 设备列表 -->
+            <div class="tab-pane fade show active" id="projects" role="tabpanel">
+                <table class="table table-hover text-center" id="projLists">
+
+                </table>
+            </div>
+        </div>
+
+        <!-- 翻页处理 -->
+        <div class="card-footer">
+            <nav aria-label="device list">
+                <ul class="pagination pagination-sm justify-content-end mb-0" id="projectPages">
+
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    {% if current_user.is_authenticated %}
+        <div class="row ">
+            <div class="col-6">
+                <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addProjectModal">
+                    <i class="fas fa-plus"></i>
+                    Add
+                </a>
+            </div>
+            <div class="col-6">
+                <a href="#" class="btn btn-danger btn-block" onclick="delProjects()" >
+                    <i class="fas fa-trash-alt"></i>
+                    Delete
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 添加项目Modal -->
+<div class="modal fade" id="addProjectModal" tabindex="-1" role="dialog" aria-labelledby="addProjModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="addProjModalLabel">新增项目</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="m-2 needs-validation" id="addProjectForm">
+
+                    <div class="form-group row">
+                        <label class="col-2" for="projName">名称<span class="text-danger pl-2">*</span></label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" id="projName" name="projName" required>
+                            <div class="invalid-feedback">
+                                项目名称不能为空
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-2" for="projDesc">描述</label>
+                        <div class="col-10">
+                            <textarea class="form-control" aria-label="Description" name="projDesc" id="projDesc"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="addProject()">确认</button>
+                <button type="button" class="btn btn-dark" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 设备列表Modal -->
+<div class="modal fade" id="showDevicesModal" tabindex="-1" role="dialog" aria-labelledby="showDevModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="showDevModalLabel">设备列表</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body pt-0 pb-0">
+                <table class="table text-center" id="devLists">
+
+                </table>
+                <nav aria-label="device page">
+                    <ul class="pagination pagination-sm justify-content-end mb-0" id="devPages">
+
+                    </ul>
+                </nav>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success cancel" data-dismiss="modal">关闭</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 新增项目提示 -->
+<div class="modal fade" id="firstNewConfirmModal" tabindex="-1" role="dialog" aria-labelledby="firstNewConfirmLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="firstNewConfirmLabel"><i class="fas fa-exclamation-circle text-warning"></i> 提醒</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center" id="firstNewConfirmInfo">
+          <h5>您的项目列表为空，是否创建？</h5>
+      </div>
+      <div class="modal-footer">
+          <button type="button" id="firstNewYes" class="btn btn-success yes">创建</button>
+          <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">稍后</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 删除项目确认 -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="delProjConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="delProjConfirmModalLabel"><i class="fas fa-info-circle text-danger"></i> 删除项目</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="delProjConfirmInfo">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">取消</button>
+        <button type="button" id="delProjModalYes" class="btn btn-primary yes">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 项目详细信息Modal -->
+<div class="modal fade" id="projDetailModal" tabindex="-1" role="dialog" aria-labelledby="projDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="projDetailModalLabel">项目详细信息</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body" id="detailInfo">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="cancelBtn" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" style="display: none;" id="okBtn">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- project rss（Modal） -->
+<div class="modal fade" id="projectRssModal" tabindex="-1" role="dialog" aria-labelledby="projectRssModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="projectRssModalLabel">RSS</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body" id="projectRssInfo">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="projectRsscancelBrn" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" style="display: none;" id="projectRssokBtn">保存</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<script>
+$(function($){
+    if($("#myProjs").hasClass("active") == true) {
+        displayProjects("{{ current_user.id }}");
+    }
+    else{
+        displayProjects();
+    }
+})
+</script>
+
+{% endblock %}

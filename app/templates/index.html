@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block theme %}
+{{ theme }}
+{% endblock %}
+
+{% block content %}
+<link href="https://cdn.bootcss.com/highcharts/7.0.3/css/highcharts.css" rel="stylesheet">
+<script src="https://cdn.bootcss.com/highcharts/7.0.3/modules/exporting.js"></script>
+
+<div class="container w-75 mb-xl-4">
+    <div class="card-columns" style="column-count: 2">
+        <div class="card">
+            <div class="card-header">
+                Projects
+            </div>
+            <div class="card-body" id="project">
+
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                Devices
+            </div>
+            <div class="card-body" id="device">
+
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                Map
+            </div>
+            <div class="card-body" id="map">
+
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                History
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">First</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">1</th>
+                      <td>Mark</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">2</th>
+                      <td>Jacob</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">3</th>
+                      <td>@twitter</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        Highcharts.chart('device', {
+
+          chart: {
+            styledMode: true
+          },
+          series: [{
+            type: 'pie',
+            allowPointSelect: false,
+            keys: ['name', 'y', 'selected', 'sliced'],
+            data: [
+              ['Online', 29.9, false],
+              ['Offline', 71.5, false],
+              ['Coredump', 106.4, false],
+              ['Unknown', 129.2, false],
+              ['Alarm', 135.6, true, true],
+            ],
+            showInLegend: false
+          }]
+        });
+
+        Highcharts.chart('project', {
+          chart: {
+            type: 'bar'
+          },
+          xAxis: {
+            categories: ['Project1', 'Project2', 'Project3', 'Project4', 'Project5']
+          },
+          yAxis: {
+            min: 0,
+            title: {
+              text: 'Total fruit consumption'
+            }
+          },
+          legend: {
+            reversed: true
+          },
+          plotOptions: {
+            series: {
+              stacking: 'normal'
+            }
+          },
+          series: [{
+            name: 'Online',
+            data: [5, 3, 4, 7, 2]
+          }, {
+            name: 'Offline',
+            data: [2, 2, 3, 2, 1]
+          }, {
+              name: 'Unknown',
+            data: [2, 2, 3, 2, 1]
+          }, {
+              name: 'Alarm',
+            data: [2, 2, 3, 2, 1]
+          }, {
+            name: 'Coredump',
+            data: [3, 4, 4, 2, 5]
+          }]
+        });
+
+
+    </script>
+</div>
+{% endblock %}

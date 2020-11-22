@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block theme %}
+{{ theme }}
+{% endblock %}
+
+{% block content %}
+
+<script src="{{ url_for('static', filename='js/mydetail.js')}}"></script>
+
+<div class="container w-75 mb-xl-4">
+    <div id="myCard" class="card shadow-sm mt-2 mb-2 border-warning">
+        <div id="myHeader" class="card-header text-center bg-transparent border-warning">
+            {% for each in dev_info %}
+            {% if each['status'] == "ONLINE" %}
+            <button class="btn btn-success active" id="{{ each['id'] }}" data-ip="{{ each['ip'] }}" data-os="{{ each['os'] }}" data-user="{{ each['user'] }}" data-desc="{{ each['desc'] }}" onclick="renderContent(this)" style="margin: 2px">{{ each['name'] }}</button>
+            {% elif each['status'] == "UNKNOWN" %}
+            <button class="btn btn-warning active" id="{{ each['id'] }}" data-ip="{{ each['ip'] }}" data-os="{{ each['os'] }}" data-user="{{ each['user'] }}" data-desc="{{ each['desc'] }}" onclick="renderContent(this)" style="margin: 2px">{{ each['name'] }}</button>
+            {% elif each['status'] == "OFFLINE" %}
+            <button class="btn btn-secondary active" id="{{ each['id'] }}" data-ip="{{ each['ip'] }}" data-os="{{ each['os'] }}" data-user="{{ each['user'] }}" data-desc="{{ each['desc'] }}" onclick="renderContent(this)" style="margin: 2px">{{ each['name'] }}</button>
+            {% else %}
+            <button class="btn btn-danger active" id="{{ each['id'] }}" data-ip="{{ each['ip'] }}" data-os="{{ each['os'] }}" data-user="{{ each['user'] }}" data-desc="{{ each['desc'] }}" onclick="renderContent(this)" style="margin: 2px">{{ each['name'] }}</button>
+            {% endif %}
+            {% endfor %}
+            <div class="row">
+                <div class="col">
+                    <hr class="text-dark" style="margin: 12px">
+                </div>
+
+                <div class="col-md-auto" style="padding:0" id="down" onclick="updown('up')">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="col-md-auto" style="padding:0; display: none" id="up" onclick="updown('down')">
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+                <div class="col">
+                    <hr class="text-dark" style="margin: 12px">
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="container">
+                <div id="cont1" style="min-height: 50px">
+                </div>
+                <hr>
+                <div id="cont2" style="min-height: 200px">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        $(function($){
+            $("#up").hide();
+            var myWidth=10;
+            $("button.btn").each(function(){
+                if((myWidth+this.offsetWidth)<$("#myHeader")[0].offsetWidth){
+                    this.hidden=false;
+                }
+                else{
+                    this.hidden=true;
+                }
+                myWidth += this.offsetWidth+10;
+                });
+        })
+        $(function($){renderStatus()})
+
+    </script>
+</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,11 @@
+alembic
+Flask
+Flask-Moment
+Flask-Script
+numpy
+mysql-python
+SQLAlchemy
+supervisor
+flask-login
+yagmail
+xmltodict

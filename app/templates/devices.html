@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block theme %}
+{{ theme }}
+{% endblock %}
+
+{% block content %}
+<script src="{{ url_for('static', filename='js/device.js')}}"></script>
+
+<div class="container w-75 mb-xl-4">
+
+    <div class="card shadow-sm mt-2 mb-2">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs nav-fill" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link {% if current_user.is_authenticated %}active{% else %}disabled{% endif %}" id="myDevs" href="#" onclick="displayDevices({{ current_user.id }})" data-toggle="tab" role="tab" aria-selected="{% if current_user.is_authenticated %}true{% else %}false{% endif %}">My Devices</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if not current_user.is_authenticated %}active{% endif %}" id="allDevs" href="#" onclick="displayDevices()" data-toggle="tab" role="tab" aria-selected="{% if not current_user.is_authenticated %}true{% else %}false{% endif %}">All Devices</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body pt-0 pb-0" id="devicesTabs">
+
+            <!-- 设备列表 -->
+            <div class="tab-pane fade show active" id="devices" role="tabpanel">
+                <table class="table table-hover text-center" id="devLists">
+
+                </table>
+            </div>
+        </div>
+
+        <!-- 翻页处理 -->
+        <div class="card-footer">
+            <nav aria-label="device list">
+                <ul class="pagination pagination-sm justify-content-end mb-0" id="devicePages">
+
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <p></p>
+    
+    {% if current_user.is_authenticated %}
+        <div class="row">
+            <div class="col-6">
+                <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addDeviceModal">
+                    <i class="fas fa-plus"></i>
+                    Add
+                </a>
+            </div>
+            <div class="col-6">
+                <a href="#" class="btn btn-danger btn-block" onclick="delDevices()" >
+                    <i class="fas fa-trash-alt"></i>
+                    Delete
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 新增设备Modal -->
+<div class="modal fade" id="addDeviceModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" >新增设备</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="m-3 needs-validation" id="addDeviceForm">
+
+                    <div class="form-group row">
+                        <label class="col-2" for="name">名称<span class="text-danger pl-2">*</span></label>
+                        <div class="col-4">
+                            <input type="text" class="form-control form-control-sm" id="name" name="name" required>
+                            <div class="invalid-feedback">
+                                必须指定名称
+                            </div>
+                        </div>
+                        <label class="col-2" for="project">项目<span class="text-danger pl-2">*</span></label>
+                        <div class="col-4">
+                            <select id="project" class="form-control form-control-sm" name="project">
+                                <option selected value="">Choose...</option>
+                                <!--<option value="{{ id }}">{{ name }}</option>-->
+                            </select>
+                            <div class="invalid-feedback">
+                                项目不能为空
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-2" for="user">用户名</label>
+                        <div class="col-4">
+                            <input type="text" class="form-control form-control-sm" id="user" name="user" placeholder="beta">
+                        </div>
+
+                        <label class="col-2" for="password">密码</label>
+                        <div class="col-4">
+                            <input type="password" class="form-control form-control-sm" id="password" name="password" placeholder="beta">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label" for="ip">管理IP<span class="text-danger pl-2">*</span></label>
+                        <div class="col-4">
+                            <input type="text" class="form-control form-control-sm" id="ip" name="ip" required>
+                            <div class="invalid-feedback">
+                                需要指定设备管理IP
+                            </div>
+                        </div>
+                        <label class="col-2 col-form-label" for="sn">S/N</label>
+                        <div class="col-4">
+                            <input type="text" class="form-control form-control-sm" id="sn" name="sn">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label" for="os">OS</label>
+                        <div class="col-4">
+                            <select id="os" class="form-control form-control-sm" name="os">
+                                <option selected value="StoneOS">StoneOS</option>
+
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label" for="method">连接方式</label>
+                        <div class="col-10" id="method">
+                            <div class="form-group row mb-0">
+                                <div class="col-2">
+                                    <input class="form-check-inline" type="checkbox" id="ssh" name="ssh" onselect="" checked>
+                                    <label class="col-form-label col-form-label-sm" for="ssh">SSH</label>
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control form-control-sm" id="sshPort" name="sport" placeholder="22"/>
+                                </div>
+                                <div class="col-2">
+                                    <input class="form-check-inline" type="checkbox" id="telnet" name="telnet" onselect="">
+                                    <label class="col-form-label col-form-label-sm" for="telnet">Telnet</label>
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control form-control-sm" id="telnetPort" name="tport" placeholder="23">
+                                </div>
+                                <!--div class="col-4">
+                                    <input class="form-check-inline" type="checkbox" id="rest_api" name="rest_api" onselect="" disabled>
+                                    <label class="col-form-label col-form-label-sm" for="rest_api">Rest API</label>
+                                </div-->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--div class="form-group row">
+                        <label class="col-2" for="Deploy">部署模式</label>
+                        <div class="col-10" id="Deploy">
+                            <div class="form-group row">
+                                <div class="col-5">
+                                    <input class="form-check-inline" type="radio" name="deploy" id="inline" value="inline" checked>
+                                    <label class="form-check-label form-control-sm" for="inline">In-Line</label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-check-inline" type="radio" name="deploy" id="tap" value="tap">
+                                    <label class="form-check-label form-control-sm" for="tap">Tap</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div-->
+
+                    <div class="form-group row">
+                        <label class="col-2" for="desc">描述</label>
+                        <div class="col-10">
+                            <textarea class="form-control form-control-sm" aria-label="Description" name="detaildesc" id="detaildesc"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-2">
+
+                        </div>
+                        <div class="col-10">
+                            <div class="custom-control custom-control-inline custom-switch">
+                                <input class="custom-control-input" type="checkbox" id="admin_status" name="admin_status" checked>
+                                <label class="custom-control-label" for="admin_status">
+                                    已上线
+                                </label>
+                            </div>
+                            <div class="custom-control custom-control-inline custom-switch">
+                                <input class="custom-control-input" type="checkbox" id="daily_report" name="daily_report">
+                                <label class="custom-control-label" for="daily_report">
+                                    开启日报
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="addDevice()">Submit</button>
+                <button type="button" class="btn btn-dark" data-dismiss="modal">取消</button>
+            </div>
+            <!--<script type="text/javascript">-->
+                <!--$('#addDeviceForm').bootstrapValidator({-->
+                        <!--//        live: 'disabled',-->
+                        <!--message: 'This value is not valid',-->
+                        <!--feedbackIcons: {-->
+                            <!--valid: 'glyphicon glyphicon-ok',-->
+                            <!--invalid: 'glyphicon glyphicon-remove',-->
+                            <!--validating: 'glyphicon glyphicon-refresh'-->
+                        <!--},-->
+                        <!--fields: {-->
+                            <!--sn: {-->
+                                <!--message: 'The sn is not valid',-->
+                                <!--validators: {-->
+                                    <!--&lt;!&ndash;notEmpty: {&ndash;&gt;-->
+                                        <!--&lt;!&ndash;message: '<p class=\'text-danger col-lg-10\'>The username is required and cannot be empty</p>'&ndash;&gt;-->
+                                    <!--&lt;!&ndash;},&ndash;&gt;-->
+                                    <!--stringLength: {-->
+                                        <!--min: 1,-->
+                                        <!--max: 20,-->
+                                        <!--message: '<p class=\'text-danger col-lg-10\'>The sn must be  less than 20 characters long</p>'-->
+                                    <!--},-->
+                                    <!--regexp: {-->
+                                        <!--regexp: /^[a-zA-Z0-9_\.]+$/,-->
+                                        <!--message: '<p class=\'text-danger col-lg-10\'>The username can only consist of alphabetical, number, dot and underscore</p>'-->
+                                    <!--}-->
+
+                        <!--}-->
+                    <!--}-->
+                <!--}-->
+                <!--});-->
+            <!--</script>-->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 删除设备确认Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalLabel">删除设备</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="delDevConfirmInfo">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">取消</button>
+        <button type="button" id="delDevModalYes" class="btn btn-primary yes">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 设备详细信息Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">修改设备信息</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body" id="detailInfo">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="cancelBrn" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" style="display: none;" id="okBtn">保存</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 订阅模态框（Modal） -->
+<div class="modal fade" id="rssModal" tabindex="-1" role="dialog" aria-labelledby="rssModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="rssModalLabel">RSS</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body" id="rssInfo">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="rsscancelBrn" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" style="display: none;" id="rssokBtn">保存</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<script>
+$(function($){
+    setProgress(10);
+    if($("#myDevs").hasClass("active") == true) {
+        displayDevices("{{ current_user.id }}");
+    }
+    else{
+        displayDevices();
+    }
+    renderProjectList();
+    setProgress(100);
+});
+</script>
+
+{% endblock %}
