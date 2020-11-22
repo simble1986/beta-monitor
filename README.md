@@ -4,7 +4,7 @@
 
 </div>
 
-**Hillstone Beta Monitor**是一个基于 hbb2/hbb-core>和flask的**Beta设备状态监控系统**，旨在使用Web页面的方式管理部分beta设备，并使用自动化的方式对相应的设备进行信息收集及展示
+**Beta Monitor**是一个基于 hbb2/hbb-core>和flask的**Beta设备状态监控系统**，旨在使用Web页面的方式管理部分beta设备，并使用自动化的方式对相应的设备进行信息收集及展示
 
 ## Run the Beta Monitor system
 
